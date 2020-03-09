@@ -1,15 +1,18 @@
 package bookingApp;
 
 import javafx.application.Application;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.GridPane;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
+
+import java.util.Optional;
 
 public class Main extends Application {
 
@@ -57,9 +60,26 @@ public class Main extends Application {
 
         }
 
+        Button btnAdmin = new Button();
+        btnAdmin.setText("Admin Tools");
+        btnAdmin.setOnAction(this::alert);
+
         root.setCenter(grid);
-        root.setTop(new Label("Hello!"));
+        root.setTop(btnAdmin);
         primaryStage.show();
+    }
+
+    @FXML
+    private void alert(ActionEvent actionEvent) {
+        Alert a = new Alert(Alert.AlertType.CONFIRMATION);
+        a.setContentText("Do you want to use Admin Tools?");
+        Optional<ButtonType> res = a.showAndWait();
+        if (res.get() == ButtonType.OK){
+            Alert a2 = new Alert(Alert.AlertType.ERROR);
+            a2.setContentText("You're too stupid to use Admin Tools!");
+            a2.showAndWait();
+        }
+
     }
 
 
