@@ -25,6 +25,9 @@ public class Main extends Application {
     Label lbl1, lbl2;
     TextField txt;
     PasswordField pw;
+    Button btnAdmin;
+    boolean sessionIsOn = false;
+
 
 
 
@@ -79,7 +82,7 @@ public class Main extends Application {
         }   // seat representing button creation process ends
 
 
-        Button btnAdmin = new Button(); // button to access login scene
+        btnAdmin = new Button(); // button to access login scene
         btnAdmin.setPadding(new Insets(10));
         btnAdmin.setText("Admin Tools");
         btnAdmin.setOnAction(e -> window.setScene(sc2));
@@ -143,23 +146,40 @@ public class Main extends Application {
     private void login(ActionEvent actionEvent) {
         String username, password, message;
         Alert a;
-        boolean sessionIsOn = false;
         username = "admin";
         password = "admin123";
 
 
-        window.setScene(sc1);
         if (txt.getText().equals(username) && pw.getText().equals(password)){
             message = "Login Successful!";
             a = new Alert(Alert.AlertType.INFORMATION);
             sessionIsOn = true;
+            btnAdmin.setText("Log out");
+            btnAdmin.setOnAction(e ->{
+                Alert a2;
+                a2 = new Alert(Alert.AlertType.CONFIRMATION);
+                a2.setContentText("Do you want to log out?");
+                Optional<ButtonType> res = a2.showAndWait();
+                if (res.get() == ButtonType.OK){
+                    sessionIsOn = false;
+                    btnAdmin.setText("Admin Tools");
+                    btnAdmin.setOnAction(e2 -> window.setScene(sc2));
+                }
+            });
+            window.setScene(sc1);
+
         }
         else {
             message = "Username and Password does not match!";
             a = new Alert(Alert.AlertType.ERROR);
         }
+
+        txt.clear();
+        pw.clear();
+
         a.setContentText(message);
         a.showAndWait();
+
         if (sessionIsOn){
             runAdmin();
         }
