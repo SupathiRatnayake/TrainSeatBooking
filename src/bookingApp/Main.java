@@ -180,15 +180,33 @@ public class Main extends Application {
         a.setContentText(message);
         a.showAndWait();
 
-        if (sessionIsOn){
+        while (sessionIsOn){
             runAdmin();
         }
+        window.show();
 
     }
 
     private void runAdmin() {
-        String line = In.getStr("Nigga what da ya want?");
-        System.out.println("Fuck off jack ass! U'll never get what u want");
+        int choice;
+        System.out.println("1) print lol\n2)print yolo\n3)print lmao\n4)exit");
+        choice = In.getInt("Please select option: ");
+        switch (choice){
+            case 1:
+                System.out.println("lol");
+                break;
+            case 2:
+                System.out.println("yolo");
+                break;
+            case 3:
+                System.out.println("lmao");
+                break;
+            case 4:
+                sessionIsOn = false;
+                break;
+            default:
+                System.out.println("Please enter a valid option!");
+        }
     }
 
     @FXML
