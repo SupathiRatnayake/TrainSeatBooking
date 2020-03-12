@@ -1,0 +1,166 @@
+Class SeatManager:
+    - numberOfSeats: int
+    - bookings: HashMap
+
+    + SeatManager(numberOfSeats: int)
+    + addCustomer(seatNo: int, name: String): String
+    + deleteCustomer(name: String): String
+    + findSeat(name: String): int
+    + getBookingsOrdered(): LinkedHashMap
+    + storeData(): void
+    + loadData(): void
+
+Class Main:
+    - SEATING_CAPACITY: int = 42
+
+    + start(s: Stage): void
+    + main(args: String[]): void
+
+Class In: # only if you want - * Or you can have these methods in Main class
+    - in: Scanner
+
+    + static getInt(hint: String): int
+    + static getStr(hint: String): String
+    + static getInt(hint: String): int
+
+Function addCustomer(seatNo: int, name: String)
+ 
+    put seatNo, name as key, value to bookings
+    return " seat no. " seatNo + " was booked for " + name
+ 
+
+Function deleteCustomer(name: String)
+ 
+    if bookings contain name
+     
+        FOREACH entry in bookings
+         
+            if entry.value == name
+             
+                remove entry from bookings
+                return entry.value + " was removed from seat no. " + entry.key
+             
+         
+     
+    return "passenger not found!"
+ 
+
+Function findSeat(name: String)
+ 
+    if bookings contain name
+     
+        FOREACH entry in bookings
+         
+            if entry.value == name
+             
+                return entry.key
+             
+         
+     
+    return " seat no. " seatNo + " was booked for " + name
+ 
+
+Function getBookingsOrdered()
+ 
+    declare names as String Array
+    declare tamp as String
+    init ol as LinkedHashMap
+    SET bookings.values to names
+    FOR int i = 0; i < names.length; i++
+     
+        FOR int j = 0; j < names.length; j++
+         
+            IF names[j] < names[i]
+                temp = names[i]
+                names[i] = names[j]
+                names[j] = temp
+
+         
+     
+ 
+
+Function storeData()
+ 
+
+    * write to file OR use sql database OR use no sql MongoDB
+
+ 
+
+Function loadData()
+ 
+
+    * get Data from database you used
+
+ 
+
+Function showEmptySeats()
+ 
+    init window as new Stage
+    init container as AnchorPane/ FlowPane Whatever bloody *Pain*
+    BUILD GUI HERE
+    *
+    *
+    *
+    init sceneSeats as new Scene(container, width, height)
+    set sceneSeats to window
+    show & wait the window
+
+ 
+
+Function start()
+ 
+    init new SeatManager sm
+    declare choice, name, message as String
+    declare seatNo as int
+    init instructions as String "A) Add passenger E) Show empty seats..."
+
+    DO
+     
+        PROMPT instructions
+        GET choice
+        SET choice.toUpper()
+
+        CASE OF choice
+            "A":
+                GET name
+                GET seatNo
+                message = Call sm.addCustomer(seatNo, name)
+                PRINT message
+
+            "E":
+                Call showEmptySeats()
+
+            "D":
+                GET name
+                message = Call sm.deleteCustomer(name)
+                PRINT message
+
+            "F":
+                GET name
+                seatNo = Call sm.findSeat(name)
+                PRINT seatNo
+
+            "S":
+                Call sm.storeData()
+
+            "L":
+                Call sm.LoadData()
+
+            "O":
+                declare orderedBookings as LinkedHashMap
+                orderedBookings = Call sm.getBookingsOrdered()
+                FOREACH entry in orderedBookings
+                 
+                    PRINT entry.key , entry.value
+                END FOR
+
+            DEFAULT:
+                PRINT "Please enter a valid option"
+
+        END CASE
+
+     WHILE choice != "Q"
+
+ 
+Function main(args: String)
+    Call launch(args)

@@ -61,7 +61,7 @@ public class In {
         return choice;
     }
 
-    public static void showAndWait(){
+    public static void _wait(){
         getStr("Press enter to return to main menu");
     }
 

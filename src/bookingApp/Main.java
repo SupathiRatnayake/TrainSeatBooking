@@ -1,76 +1,190 @@
 package bookingApp;
 
 import javafx.application.Application;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
-import java.util.Optional;
-import java.util.Scanner;
+import java.util.*;
 
 public class Main extends Application {
 
-    SeatManager sm = new SeatManager();
-    Stage window;
-    Scene sc1, sc2;
-    BorderPane bp1, bp2;
-    GridPane grid1, grid2;
-    Label lbl1, lbl2;
-    TextField txt;
-    PasswordField pw;
-    Button btnAdmin;
-    boolean sessionIsOn = false;
-
-
-
+    private static final int SEATING_CAPACITY = 42;
 
     @Override
     public void start(Stage primaryStage) throws Exception{
-        this.window = primaryStage;
+        String pName, choice, message;
+        int seatNo;
+        LinkedHashMap<Integer, String> ol;
+        Scanner in = new Scanner(System.in);
+        SeatManager sm = new SeatManager(SEATING_CAPACITY);
 
-        // Scene sc1
+        LinkedHashMap<String, String> options = new LinkedHashMap<>();
+        options.put("A", "Add customer to seat");
+        options.put("E", "Display Empty Seats");
+        options.put("D", "Delete customer from seat");
+        options.put("F", "Find the seat for a given customers name");
+        options.put("S", "Store program data");
+        options.put("L", "Load program data");
+        options.put("O", "View seats Ordered alphabetically by name");
+        options.put("Q", "quit the program");
 
-        // BorderPane
-        bp1 = new BorderPane();
+//        init_map(sm);
 
-        // ScrollPane to contain button grid
-        ScrollPane sp = new ScrollPane();
+        do {
 
-
-        grid1 = new GridPane();     // make grid pane
-
-        grid1.setPadding(new Insets(10));    // grid pane settings
-
-
-        // init row and column indexes
-        int rowIndex = 0;
-        int colIndex = 0;
-
-        // make buttons for number of seats
-        for (int i = 1; i <= SeatManager.SEATING_CAPACITY; i++) {   // make buttons for each and every seat
-            Button btnSeat = new Button();
-            btnSeat.setText(Integer.toString(i));   // set seat number to button text
-            if (sm.getBookings().containsKey(i)) {
-                btnSeat.setDisable(true);   // if seat is already booked, make button non-clickable
+            for (String m : options.keySet()) {
+                System.out.println(m + ": " + options.get(m));
             }
 
+            System.out.print("Please select option: ");
+
+            choice = in.nextLine().toUpperCase();
+
+            switch (choice) {
+                case "A":
+                    System.out.println(options.get("A"));
+                    pName = In.getStr("Passenger Name: ");
+                    seatNo = In.getInt("Seat Number: ");
+                    message = sm.addCustomer(seatNo, pName);
+                    System.out.println(message);
+                    In._wait();
+                    break;
+
+                case "E":
+                    System.out.println(options.get("E"));
+                    showEmptySeats(sm);
+                    break;
+
+                case "D":
+                    System.out.println(options.get("D"));
+                    pName = In.getStr("Name: ");
+                    message = sm.deleteCustomer(pName);
+                    System.out.println(message);
+                    In._wait();
+
+                    break;
+
+                case "F":
+                    pName = In.getStr("Please enter passenger name: ");
+                    message = sm.findSeat(pName);
+                    System.out.println(message);
+                    In._wait();
+                    break;
+
+                case "S":
+                    System.out.println(options.get("S"));
+                    message = sm.storeData();
+                    System.out.println(message);
+                    break;
+
+                case "L":
+                    System.out.println(options.get("L"));
+                    message = sm.loadData();
+                    System.out.println(message);
+                    In._wait();
+                    break;
+
+                case "O":
+                    ol = sm.getBookingsOrdered();
+                    System.out.println(ol);
+                    In._wait();
+                    break;
+
+                case "Q":
+                    System.out.println("Quiting program...");
+                    break;
+
+                default:
+                    System.out.println("Please enter a valid option!");
+
+            }
+
+        } while (!choice.equals("Q"));
+
+        System.exit(0);
+    }
+
+    private void showEmptySeats(SeatManager sm) {
+        Stage window;
+        Scene sceneSeats;
+        BorderPane borderPane;
+        ScrollPane sp;
+        GridPane grid;
+        Button btnSeat;
+        int rowIndex,colIndex;
+        String styleAvailable, styleBooked;
+
+        grid = new GridPane();
+        rowIndex = colIndex = 0;
+
+        styleAvailable = "-fx-background-color: #9f9; -fx-border-color: #595";
+        styleBooked = "-fx-background-color: #f00; -fx-text-fill: #ff0; -fx-border-color: #500";
+
+        // Make buttons ans place in Grid FOR SEATING_CAPACITY
+        for (int i = 1; i <= SEATING_CAPACITY; i++) {   // make buttons for each and every seat
+            btnSeat = new Button();
             btnSeat.setMinWidth(50);
             btnSeat.setMinHeight(50);
+            btnSeat.setText(Integer.toString(i));   // set seat number to button text
+            btnSeat.setStyle(styleAvailable);
 
-//            btnSeat.setOnAction(this::bookSeat);    // when user click - bookSeat method is called
+            if (sm.getBookings().containsKey(i)) {
+                btnSeat.setDisable(true);   // if seat is already booked, make button non-clickable
+                btnSeat.setStyle(styleBooked);
+            }
 
-            grid1.getColumnConstraints().add(new ColumnConstraints(50));     // set column width
+            // When button is clicked handle method is called
+            // Alert user to book seat
+            // IF user response OK
+                // GET name
+                // Call SeatManager.addCustomer()
+                // Show information
+                // disable button, set style to styleBooked
+            // END IF
+            btnSeat.setOnAction(new EventHandler<ActionEvent>() {
+                @Override
+                public void handle(ActionEvent event) {
+                    Button btn;
+                    Alert a1, a2;
+                    String message;
+                    btn = (Button) event.getSource();
+
+                    // Alert a confirmation to book the seat
+                    a1 = new Alert(Alert.AlertType.CONFIRMATION);
+                    a1.setContentText("Do you want to book seat No." + btn.getText());
+                    Optional<ButtonType> res = a1.showAndWait();
+
+
+                    if (res.get() == ButtonType.OK) { // IF user clicked OK
+                        String name = In.getStr("Please enter name: "); // GET name
+                        message = sm.addCustomer(Integer.parseInt(btn.getText()), name);  // PUT entry
+                        // Alert booking information
+                        a2 = new Alert(Alert.AlertType.INFORMATION);
+                        a2.setContentText(message);
+                        a2.showAndWait();
+                        btn.setDisable(true);
+                        btn.setStyle(styleBooked);
+                    }
+
+                }
+            });
+
+            grid.getColumnConstraints().add(new ColumnConstraints(50));     // set column width
 
             // code below arranges the buttons - like in a train compartment
-
-            grid1.add(btnSeat, colIndex, rowIndex);
+            grid.add(btnSeat, colIndex, rowIndex);
             if (i % 4 == 0) {
                 rowIndex++;
             }
@@ -79,149 +193,36 @@ public class Main extends Application {
                 colIndex++;
             }
 
-        }   // seat representing button creation process ends
+        }   // END FOR
 
-
-        btnAdmin = new Button(); // button to access login scene
-        btnAdmin.setPadding(new Insets(10));
-        btnAdmin.setText("Admin Tools");
-        btnAdmin.setOnAction(e -> window.setScene(sc2));
-
-        sp.setContent(grid1);
+        grid.setPadding(new Insets(10));
+        sp = new ScrollPane();
+        sp.setContent(grid);
         sp.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        bp1.setCenter(sp);
 
-        HBox hBox = new HBox();
-        hBox.setPadding(new Insets(20));
-        hBox.getChildren().add(btnAdmin);
-        hBox.setAlignment(Pos.BASELINE_RIGHT);
-        bp1.setTop(hBox);
-        sc1 = new Scene(bp1, 300, 600);    // setting scene 1
-        // Scene sc1 done
+        borderPane = new BorderPane();
+        borderPane.setCenter(sp);
 
-        // Scene sc2
+        sceneSeats = new Scene(borderPane, 300, 400);
 
-
-        Button btnLogin, btnBack;
-        lbl1 = new Label("Username");
-        lbl1.setPadding(new Insets(20));
-        lbl2 = new Label("Password");
-        lbl2.setPadding(new Insets(20));
-        txt = new TextField();
-        pw = new PasswordField();
-        btnLogin = new Button("Login");
-        btnLogin.setPadding(new Insets(20));
-        btnLogin.setOnAction(this::login);
-        btnBack = new Button("Back");
-        btnBack.setOnAction(e -> window.setScene(sc1));
-        btnBack.setPadding(new Insets(20));
-        grid2 = new GridPane();
-        grid2.setPadding(new Insets(20));
-        grid2.getRowConstraints().add(new RowConstraints(50));     // set row height
-//        grid1.getColumnConstraints().add(new ColumnConstraints(100));     // set column width
-
-        grid2.add(lbl1, 0, 0);
-        grid2.add(txt, 1, 0);
-        grid2.add(lbl2, 0, 1);
-        grid2.add(pw, 1, 1);
-        grid2.add(btnBack, 0, 2);
-        grid2.add(btnLogin, 1, 2);
-
-        bp2 = new BorderPane();
-        bp2.setCenter(grid2);
-
-        sc2 = new Scene(bp2, 300, 600);
-
-        // Scene sc2 done
-
-
-        // window settings
-        window.setTitle("Train Seat Booking");
-        window.setScene(sc1);
-        window.setMaxWidth(300);
-        window.show();
-    }
-
-    @FXML
-    private void login(ActionEvent actionEvent) {
-        String username, password, message;
-        Alert a;
-        username = "admin";
-        password = "admin123";
-
-
-        if (txt.getText().equals(username) && pw.getText().equals(password)){
-            message = "Login Successful!";
-            a = new Alert(Alert.AlertType.INFORMATION);
-            sessionIsOn = true;
-            btnAdmin.setText("Log out");
-            btnAdmin.setOnAction(e ->{
-                Alert a2;
-                a2 = new Alert(Alert.AlertType.CONFIRMATION);
-                a2.setContentText("Do you want to log out?");
-                Optional<ButtonType> res = a2.showAndWait();
-                if (res.get() == ButtonType.OK){
-                    sessionIsOn = false;
-                    btnAdmin.setText("Admin Tools");
-                    btnAdmin.setOnAction(e2 -> window.setScene(sc2));
-                }
-            });
-            window.setScene(sc1);
-
-        }
-        else {
-            message = "Username and Password does not match!";
-            a = new Alert(Alert.AlertType.ERROR);
-        }
-
-        txt.clear();
-        pw.clear();
-
-        a.setContentText(message);
-        a.showAndWait();
-
-        while (sessionIsOn){
-            runAdmin();
-        }
-        window.show();
+        window = new Stage();
+        window.setScene(sceneSeats);
+        window.setTitle("Denuwara Menike Seat Booking");
+        window.showAndWait();
 
     }
 
-    private void runAdmin() {
-        int choice;
-        System.out.println("1) print lol\n2)print yolo\n3)print lmao\n4)exit");
-        choice = In.getInt("Please select option: ");
-        switch (choice){
-            case 1:
-                System.out.println("lol");
-                break;
-            case 2:
-                System.out.println("yolo");
-                break;
-            case 3:
-                System.out.println("lmao");
-                break;
-            case 4:
-                sessionIsOn = false;
-                break;
-            default:
-                System.out.println("Please enter a valid option!");
+    private static void init_map(SeatManager sm) {
+        Random r = new Random();
+        String[] d = {"Sam", "Aaron", "Danny", "Matt", "Stacey"};
+        for (int i = 1; i < d.length; i++) {
+
+            int n = r.nextInt(42) + 1;
+            sm.addCustomer(n, d[i]);
+
         }
+        sm.addCustomer(40, "James");
     }
-
-    @FXML
-    private void alert(ActionEvent actionEvent) {
-        Alert a = new Alert(Alert.AlertType.CONFIRMATION);
-        a.setContentText("Do you want to use Admin Tools?");
-        Optional<ButtonType> res = a.showAndWait();
-        if (res.get() == ButtonType.OK){
-            Alert a2 = new Alert(Alert.AlertType.ERROR);
-            a2.setContentText("You're too stupid to use Admin Tools!");
-            a2.showAndWait();
-        }
-
-    }
-
 
     public static void main(String[] args) {
         launch(args);
