@@ -40,7 +40,7 @@ public class Main extends Application {
         options.put("O", "View seats Ordered alphabetically by name");
         options.put("Q", "quit the program");
 
-//        init_map(sm);
+//        init_map(sm);     // method to fill Dummy data to sm.bookings
 
         do {
 
